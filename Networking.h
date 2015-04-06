@@ -38,7 +38,7 @@ class Networking : public QTcpSocket{
 		Networking(const QHostAddress& address, quint16 port,
 				QObject* parent=0);
         ~Networking();
-        long double** getArea() { return area; }
+        quint16** getArea() { return area; }
 
 	public slots:
         void sendData();
@@ -48,7 +48,7 @@ class Networking : public QTcpSocket{
 	signals:
 		void receivedWidth(int width);
         void iterate();
-        void remap(int height, long double**a);
+        void remap(int height, quint16**a);
 		void sockStateChanged(QAbstractSocket::SocketState st);
 
 	private slots:
@@ -62,13 +62,12 @@ class Networking : public QTcpSocket{
         bool handleMessageRemap(QDataStream& stream);
         bool handleMessageWidth(QDataStream& stream);
 
-		long double readValue(QDataStream& stream);
-		quint16 fromLongDouble(long double val);
+        quint16 readValue(QDataStream& stream);
 		
 	private:
 		int width;
         int height,tempHeight;
-        long double** area;
+        quint16** area;
 
         QByteArray partialData;
 };

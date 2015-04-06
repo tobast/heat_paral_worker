@@ -29,7 +29,7 @@ private slots:
     void nouveau();
 
 private:
-    QRgb dbg_colorOf(long double val);
+    QRgb dbg_colorOf(quint16 val);
     //Networking sck;
     //Travail t;
 

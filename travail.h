@@ -25,7 +25,7 @@ public slots:
     void arret();
 
     void largeur(int la);
-    void redimensionner(int ha, long double **a);
+    void redimensionner(int ha, quint16 **a);
     void etape();
 
 private:
@@ -34,7 +34,8 @@ private:
     int pret;
     int f;
     int x,y,l,h,k;
-    long double **vit,**temp, **t2,dt,D;
+    quint16 **vit,**temp, **t2;
+    double dt,D;
 
 
     Calcul *thr[NB_THREAD];

@@ -9,7 +9,7 @@ Fenetre::Fenetre(QWidget *parent) :
 
     connect(t, SIGNAL(fini()), sck, SLOT(sendData()));
     connect(sck, SIGNAL(receivedWidth(int)), t, SLOT(largeur(int)));
-    connect(sck, SIGNAL(remap(int, long double**)), t, SLOT(redimensionner(int, long double**)));
+    connect(sck, SIGNAL(remap(int, quint16**)), t, SLOT(redimensionner(int, quint16**)));
     connect(sck, SIGNAL(iterate()), t, SLOT(etape()));
     connect(sck, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(message(QAbstractSocket::SocketState)));
 */
@@ -38,9 +38,9 @@ void Fenetre::connecter(){
     /*
 
     t->largeur(500);
-    long double **p = (long double**) malloc(sizeof(long double*)*200);
+    quint16 **p = (quint16**) malloc(sizeof(quint16*)*200);
     for(int i(0);i<200;++i){
-        p[i] = (long double*) malloc(sizeof(long double)*500);
+        p[i] = (quint16*) malloc(sizeof(quint16)*500);
         for(int j(0);j<500;++j){
             p[i][j]=-1;
         }
@@ -48,9 +48,9 @@ void Fenetre::connecter(){
 
     t->redimensionner(200, p);
 
-    p = (long double**) malloc(sizeof(long double*)*2);
+    p = (quint16**) malloc(sizeof(quint16*)*2);
     for(int i(0);i<2;++i){
-        p[i] = (long double*) malloc(sizeof(long double)*500);
+        p[i] = (quint16*) malloc(sizeof(quint16)*500);
         for(int j(0);j<500;++j){
             p[i][j]=-1;
         }
@@ -102,7 +102,7 @@ void Fenetre::dbg_displayArea()
 {
     /// /!\ DEBUG ONLY
     if(groupDebug->isChecked()) {
-        long double** area = qobject_cast<Networking*>(sender())->getArea();
+        quint16** area = qobject_cast<Networking*>(sender())->getArea();
         for(int row=0; row < dbg_areaImage.height(); row++)
             for(int col=0; col < dbg_areaImage.width(); col++)
                 dbg_areaImage.setPixel(col,row,dbg_colorOf(area[row][col]));
@@ -130,23 +130,21 @@ void Fenetre::nouveau(){
 
     connect(t[k], SIGNAL(fini()), sck[k], SLOT(sendData()));
     connect(sck[k], SIGNAL(receivedWidth(int)), t[k], SLOT(largeur(int)));
-    connect(sck[k], SIGNAL(remap(int, long double**)), t[k], SLOT(redimensionner(int, long double**)));
+    connect(sck[k], SIGNAL(remap(int, quint16**)), t[k], SLOT(redimensionner(int, quint16**)));
     connect(sck[k], SIGNAL(iterate()), t[k], SLOT(etape()));
     connect(pushButton, SIGNAL(clicked()), this, SLOT(connecter()));
     connect(sck[k], SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(message(QAbstractSocket::SocketState)));
     connect(sck[k], SIGNAL(iterate()), this, SLOT(dbg_displayArea()));
     connect(sck[k], SIGNAL(receivedWidth(int)), this, SLOT(dbg_resizeImgWidth(int)));
-    connect(sck[k], SIGNAL(remap(int,long double**)), this, SLOT(dbg_resizeImg(int)));
+    connect(sck[k], SIGNAL(remap(int,quint16**)), this, SLOT(dbg_resizeImg(int)));
 
     sck[k]->connectSocket(QHostAddress(lineEdit->text()), (quint16) spinBox->value());
     ++k;
 }
 
-QRgb Fenetre::dbg_colorOf(long double val)
+QRgb Fenetre::dbg_colorOf(quint16 val)
 {
-    val = (val < 0) ? -val : val;
-    val -= 1000;
     return QColor::fromHsv(
-         std::max(0,std::min(240,(int)(240 - val * 240.0/300.0))),
+         std::max(0,std::min(240,(int)(240 - val * 240.0/16000.0))),
          0xFF,0xFF).rgb();
 }

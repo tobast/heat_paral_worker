@@ -41,7 +41,7 @@ void Networking::sendData() {
 //    stream << (quint8)MESSAGE_DATAFEEDBACK;
 	for(int row=1; row < height-1; row++) {
 		for(int col=0; col < width; col++) {
-            stream << fromLongDouble(area[row][col]);
+            stream << area[row][col];
 		}
 	}
 	write(msg);
@@ -101,26 +101,11 @@ void Networking::dataReceived() {
     }
 }
 
-quint16 Networking::fromLongDouble(long double val) {
-	quint16 out=0;
-	if(val < 0) {
-		out |= 0x8000;
-		val *= -1;
-	}
-	out += (quint16) (val-1000) * 16000.0/300.0;
-	return out;
-}
-long double Networking::readValue(QDataStream& stream) {
-	long double out;
+quint16 Networking::readValue(QDataStream& stream) {
 	quint16 data;
-	stream >> data; // in range [0,16 000]
-    //qDebug() << data << (double) out << "Ici, c'est perdu !";
-    out = ((long double)(data & (~0x8000)) * 300.)/16000.
-            + 1000.0;
-	if((data & 0x8000) != 0)
-		out *= -1;
-    //qDebug() << (double) out << data;
-	return out;
+    stream >> data; // in range [0,16 000]
+
+    return data;
 }
 bool Networking::handleMessageProcess(QDataStream& stream) {
 	if(width < 0) // Not initialized yet
@@ -147,13 +132,8 @@ bool Networking::handleMessageRemap(QDataStream& stream) {
     stream >> nHeight;
     tempHeight = nHeight;
 
-    qDebug() << "Paquet reçu";
-
-
-    if((size_t)partialData.size() < ((tempHeight-2)*width+1)*sizeof(quint16) + sizeof(quint8)+00)
+    if((size_t)partialData.size() < ((tempHeight-2)*width+1)*sizeof(quint16) + sizeof(quint8))
         return false; // Waiting for the full packet to be read.
-
-    qDebug() << " fin analyse paquet";
 
     // Cleaning previous mem
     if(area != NULL) {
@@ -162,18 +142,14 @@ bool Networking::handleMessageRemap(QDataStream& stream) {
         delete[] area;
     }
 
-    qDebug("Bonjour les enfants");
-    area = (long double**) malloc(sizeof(long double*) * nHeight);
+    area = (quint16**) malloc(sizeof(quint16*) * nHeight);
     for(int row=0; row < nHeight; row++) {
-        area[row] = (long double*) malloc(sizeof(long double) * width);
+        area[row] = (quint16*) malloc(sizeof(quint16) * width);
 		
         if(row >= 1 && row < nHeight-1) {
             for(int col=0; col < width; col++)
                 area[row][col] = readValue(stream);
         }
-
-        //qDebug() << (double) area[row][50];
-
 	}
 	
     height = tempHeight;

@@ -13,7 +13,7 @@ class Calcul : public QThread
 {
     Q_OBJECT
 public:
-    explicit Calcul(int i, int j, int la, int he, long double **vi, long double **p, long double **p2, long double vD, long double vdt, QObject *parent = 0);
+    explicit Calcul(int i, int j, int la, int he, quint16 **vi, quint16 **p, quint16 **p2, double vD, double vdt, QObject *parent = 0);
     ~Calcul();
     void redemarrer();
     //void arret();
@@ -25,12 +25,18 @@ public slots:
 
 private:
     void run();
+    double dist(int distx, int disty);
+
     int x,y,h,l;
-    long double **vit,**temp, **t2,dt,D;
+    quint16 **vit,**temp, **t2;
+    double dt,D;
     bool act, pause;
     QColor cc;
 
-    QColor couleur(long double t);
+    QColor couleur(quint16 t);
+
+    static const int ADJACENCY[8][2];
+    static const size_t ADJACENCY_SIZE;
 };
 
 #endif // CALCUL_H
