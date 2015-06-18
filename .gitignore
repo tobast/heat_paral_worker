@@ -1,4 +1,4 @@
-heat_master
+Worker_Propagation
 *.swp
 *.o
 moc_*
